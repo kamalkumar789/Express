@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -65,6 +66,7 @@ public class OrderService {
         return new ResponseEntity<Orders>(order, HttpStatus.CREATED);
     }
     public ResponseEntity<CustomerValidateResp> valiadateCustomer(CustomerData customerData) throws Exception{
+        //These externalApiCustomers usershost and all other field will be get from config server
         String apiUrl = externalApiCustomers.getMyusershost()+":"+externalApiCustomers.getMyusersport()+externalApiCustomers.getMyusersapiurl();
         log.info("Verifying customer......");
         log.info("External Api To Validate Customers: "+apiUrl);
@@ -75,4 +77,5 @@ public class OrderService {
         ResponseEntity<CustomerValidateResp> response = restTemplate.exchange(apiUrl,HttpMethod.POST,httpEntity, CustomerValidateResp.class);
         return response;
     }
+
 }

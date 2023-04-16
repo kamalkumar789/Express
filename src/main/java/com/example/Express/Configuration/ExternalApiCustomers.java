@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Getter
 @Setter
+//This external will be picked from config server
 @ConfigurationProperties("external")
 @Configuration
 public class ExternalApiCustomers {
