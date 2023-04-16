@@ -11,3 +11,5 @@
 # spring.datasource.password= 
 
 # Run Express application
+
+# Make Sure MyUsers Service is working before creating an order
