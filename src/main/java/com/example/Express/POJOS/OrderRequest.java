@@ -16,7 +16,7 @@ import java.util.List;
 public class OrderRequest {
 
     @JsonProperty("Customer")
-    private CustomerData data;
+    private CustomerData customerData;
 
     @JsonProperty("Products")
     private List<ProductData> productDataList;

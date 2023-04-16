@@ -31,4 +31,9 @@ public class Orders {
     @JoinTable(name="Product_Order", joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> product;
 
+    @Column(name = "CustomerID")
+    private Integer customerId;
+
+    @Column(name = "CustomerCnic")
+    private Long customerCnic;
 }
