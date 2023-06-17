@@ -6,6 +6,7 @@ import com.example.Express.Model.Product;
 import com.example.Express.POJOS.*;
 import com.example.Express.Repositories.OrdersRepository;
 import com.example.Express.Repositories.ProductRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,9 @@ public class OrderService {
 
     @Autowired
     private ExternalApiCustomers externalApiCustomers;
+
+    private final String breaker1 = "MYUSERS_BREAKER";
+
     public ResponseEntity<Orders> createOrder(OrderRequest orderRequest) throws Exception{
 
         log.info("Verifying products.....");
@@ -55,18 +59,20 @@ public class OrderService {
             products.add(product);
             sum = sum + product.getPrice();
         }
-        Orders orders = new Orders();
-        orders.setProduct(products);
-        orders.setPrice(sum);
-        orders.setCustomerId(orderRequest.getCustomerData().getId());
-        orders.setCustomerCnic(orderRequest.getCustomerData().getIdCardNumber());
+        Orders orders = Orders.builder().price(sum)
+                        .customerCnic(orderRequest.getCustomerData().getIdCardNumber())
+                        .product(products)
+                        .customerId(orderRequest.getCustomerData().getId())
+                        .build();
+
         Orders order = ordersRepository.save(orders);
         log.info("Order has been created...");
 
         return new ResponseEntity<Orders>(order, HttpStatus.CREATED);
     }
+    @CircuitBreaker(name = breaker1, fallbackMethod = "fallBackMethodOfCircuitBreaker")
     public ResponseEntity<CustomerValidateResp> valiadateCustomer(CustomerData customerData) throws Exception{
-        //These externalApiCustomers usershost and all other field will be get from config server
+        //These externalApiCustomders usershost and all other field will be get from config server
         String apiUrl = externalApiCustomers.getMyusershost()+":"+externalApiCustomers.getMyusersport()+externalApiCustomers.getMyusersapiurl();
         log.info("Verifying customer......");
         log.info("External Api To Validate Customers: "+apiUrl);
@@ -76,6 +82,10 @@ public class OrderService {
         HttpEntity<ValidateCustomerRequest> httpEntity = new HttpEntity<ValidateCustomerRequest>(validateCustomer);
         ResponseEntity<CustomerValidateResp> response = restTemplate.exchange(apiUrl,HttpMethod.POST,httpEntity, CustomerValidateResp.class);
         return response;
+    }
+
+    public void fallBackMethodOfCircuitBreaker(){
+        log.info("Error and hence could not be able to connect with external api ...");
     }
 
 }

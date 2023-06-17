@@ -16,10 +16,11 @@ public class ProductService {
 
     public ResponseEntity<Product> addProduct(ProductRequest productRequest) throws Exception{
 
-        Product product = new Product();
-        product.setName(productRequest.getName());
-        product.setVariant(productRequest.getVariant());
-        product.setPrice(productRequest.getPrice());
+        Product product = Product.builder()
+                        .name(productRequest.getName())
+                        .price(productRequest.getPrice())
+                        .variant(productRequest.getVariant()).build();
+
         product = productRepository.save(product);
 
         return new ResponseEntity<Product>(product, HttpStatus.CREATED);
